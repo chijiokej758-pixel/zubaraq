@@ -252,3 +252,36 @@ async function submitAuth() {
     await loginUser(email, password);
   }
 }
+
+// =========================================
+// ZUBARAQ LOGGED-IN USER
+// =========================================
+
+async function checkUserSession() {
+  const { data } = await supabaseClient.auth.getSession();
+
+  if (data.session) {
+    showLoggedInUser(data.session.user);
+  }
+}
+
+function showLoggedInUser(user) {
+  const authButtons = document.getElementById('auth-buttons');
+
+  if (!authButtons) return;
+
+  const name =
+    user.user_metadata?.full_name ||
+    user.email?.split('@')[0] ||
+    'User';
+
+  authButtons.innerHTML = `
+    <span>Welcome, ${name} 👋</span>
+    <button onclick="logoutUser(); location.reload();">
+      Logout
+    </button>
+  `;
+}
+
+// Check when website loads
+checkUserSession();
