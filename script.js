@@ -50,7 +50,7 @@ const products = [
     name: "Premium Cocoa Beans — Grade 1",
     price: 2480,
     unit: "tonne",
-    moq: 5,
+    moq: 10,
     supplier: "Gold Coast Commodities",
     location: "Kumasi, Ghana",
     category: "Agriculture",
