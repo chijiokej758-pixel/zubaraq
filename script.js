@@ -1,3 +1,10 @@
+const SUPABASE_URL = "https://bnltctuqrinhhggjnksr.supabase.co";
+const SUPABASE_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 const menuToggle = document.querySelector('.menu-toggle');
 const navMenu = document.querySelector('.nav-menu');
 const searchForm = document.querySelector('#search-form');
