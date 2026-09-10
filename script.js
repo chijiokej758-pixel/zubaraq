@@ -201,3 +201,54 @@ async function logoutUser() {
 
   showToast('You have been logged out.');
 }
+
+// =========================================
+// ZUBARAQ LOGIN & SIGN UP UI
+// =========================================
+
+let authMode = 'login';
+
+function showAuth(mode) {
+  authMode = mode;
+
+  document.getElementById('auth-modal').style.display = 'flex';
+
+  document.getElementById('auth-title').textContent =
+    mode === 'login' ? 'Login to ZUBARAQ' : 'Create ZUBARAQ Account';
+
+  document.getElementById('auth-submit').textContent =
+    mode === 'login' ? 'Login' : 'Sign Up';
+
+  document.getElementById('auth-name').style.display =
+    mode === 'signup' ? 'block' : 'none';
+}
+
+function closeAuth() {
+  document.getElementById('auth-modal').style.display = 'none';
+}
+
+function switchAuth() {
+  showAuth(authMode === 'login' ? 'signup' : 'login');
+}
+
+async function submitAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value.trim();
+  const fullName = document.getElementById('auth-name').value.trim();
+
+  if (!email || !password) {
+    showToast('Please enter your email and password.');
+    return;
+  }
+
+  if (authMode === 'signup') {
+    if (!fullName) {
+      showToast('Please enter your full name.');
+      return;
+    }
+
+    await signUpUser(email, password, fullName);
+  } else {
+    await loginUser(email, password);
+  }
+}
