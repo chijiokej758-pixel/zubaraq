@@ -1,4 +1,14 @@
+/* =========================================================
+   ZUBARAQ — MAIN JAVASCRIPT
+   Marketplace + Supabase Auth + Account
+   ========================================================= */
+
 const SUPABASE_URL = "https://bnltctuqrinhhggjnksr.supabase.co";
+
+/*
+  KEEP YOUR EXISTING SUPABASE PUBLISHABLE KEY HERE.
+  Do NOT use the service_role/secret key.
+*/
 const SUPABASE_KEY = "sb_publishable_YKVkY0UIjbYoxafgaNv-0A_ajI7NS6u";
 
 const supabaseClient = window.supabase.createClient(
@@ -6,807 +16,823 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_KEY
 );
 
-// =========================================
-// ZUBARAQ BASIC UI
-// =========================================
-
-const menuToggle = document.querySelector('.menu-toggle');
-const navMenu = document.querySelector('.nav-menu');
-const searchForm = document.querySelector('#search-form');
-const searchInput = document.querySelector('#search-input');
-const toast = document.querySelector('#toast');
-
-let toastTimer;
-
-const marketplaceSearch = document.querySelector('#marketplace-search');
-const categoryFilter = document.querySelector('#category-filter');
-const sortProducts = document.querySelector('#sort-products');
-const productGrid = document.querySelector('#product-grid');
-const productDetail = document.querySelector('#product-detail');
-const emptyState = document.querySelector('#empty-state');
-const marketplaceCount = document.querySelector('#marketplace-count');
-const clearFilters = document.querySelector('#clear-filters');
+/* =========================================================
+   DEMO MARKETPLACE PRODUCTS
+   ========================================================= */
 
 const products = [
   {
-    id: 'solar-panels',
-    name: 'Monocrystalline Solar Panels 450W',
-    category: 'Electronics',
+    id: "solar-panels",
+    name: "Monocrystalline Solar Panels 450W",
     price: 85,
-    unit: 'unit',
-    moq: '50 units',
-    supplier: 'Oasis Solar Ltd.',
-    initials: 'OS',
-    location: 'Lagos, Nigeria',
-    badge: 'Top seller',
-    image: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=900&q=85',
-    description: 'High-efficiency 450W panels built for commercial rooftops, mini-grids, and reliable off-grid power across Africa.'
+    unit: "unit",
+    moq: 50,
+    supplier: "Oasis Solar Ltd.",
+    location: "Lagos, Nigeria",
+    category: "Energy",
+    description:
+      "High-efficiency monocrystalline solar panels suitable for homes, businesses and large solar installations."
   },
   {
-    id: 'ankara-fabric',
-    name: 'Premium Wax Print Ankara Fabric',
-    category: 'Fashion & Clothing',
+    id: "ankara-fabric",
+    name: "Premium Wax Print Ankara Fabric",
     price: 4.2,
-    unit: 'yard',
-    moq: '100 yards',
-    supplier: 'Kente & Co. Textiles',
-    initials: 'KC',
-    location: 'Accra, Ghana',
-    badge: 'New arrival',
-    image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=900&q=85',
-    description: 'Richly patterned wax print fabric with colorfast finishing, ideal for fashion labels, uniforms, and retail collections.'
+    unit: "yard",
+    moq: 100,
+    supplier: "Kente & Co. Textiles",
+    location: "Accra, Ghana",
+    category: "Textiles",
+    description:
+      "Premium African wax print fabric suitable for fashion brands, wholesalers and clothing manufacturers."
   },
   {
-    id: 'cocoa-beans',
-    name: 'Premium Cocoa Beans - Grade 1',
-    category: 'Food & Agriculture',
+    id: "cocoa-beans",
+    name: "Premium Cocoa Beans — Grade 1",
     price: 2480,
-    unit: 'tonne',
-    moq: '5 tonnes',
-    supplier: 'Gold Coast Commodities',
-    initials: 'GC',
-    location: 'Kumasi, Ghana',
-    badge: 'In demand',
-    image: 'https://images.unsplash.com/photo-1511381939415-e44015466834?auto=format&fit=crop&w=900&q=85',
-    description: 'Carefully sorted Grade 1 cocoa beans sourced from established farmer cooperatives and prepared for export.'
+    unit: "tonne",
+    moq: 5,
+    supplier: "Gold Coast Commodities",
+    location: "Kumasi, Ghana",
+    category: "Agriculture",
+    description:
+      "Export-grade cocoa beans sourced from trusted West African producers."
   },
   {
-    id: 'shea-butter',
-    name: 'Organic Unrefined Shea Butter',
-    category: 'Beauty & Cosmetics',
+    id: "shea-butter",
+    name: "Organic Unrefined Shea Butter",
     price: 6.8,
-    unit: 'kg',
-    moq: '50 kg',
-    supplier: 'Savanna Naturals',
-    initials: 'SN',
-    location: 'Tamale, Ghana',
-    badge: 'Organic',
-    image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=900&q=85',
-    description: 'Traceable, unrefined shea butter for skincare, haircare, and cosmetic manufacturing with a smooth natural finish.'
+    unit: "kg",
+    moq: 50,
+    supplier: "Savanna Naturals",
+    location: "Tamale, Ghana",
+    category: "Beauty",
+    description:
+      "Organic unrefined shea butter for cosmetics, skincare and manufacturing."
   },
   {
-    id: 'cement-blocks',
-    name: 'Portland Cement 42.5R',
-    category: 'Building Materials',
+    id: "cement",
+    name: "Portland Cement 42.5R",
     price: 9.5,
-    unit: 'bag',
-    moq: '500 bags',
-    supplier: 'BuildRight Materials',
-    initials: 'BM',
-    location: 'Nairobi, Kenya',
-    badge: 'Bulk ready',
-    image: 'https://images.unsplash.com/photo-1503387762-592dea58ef25?auto=format&fit=crop&w=900&q=85',
-    description: 'Consistent high-strength cement for commercial construction, infrastructure, and residential projects.'
+    unit: "bag",
+    moq: 500,
+    supplier: "BuildRight Materials",
+    location: "Nairobi, Kenya",
+    category: "Construction",
+    description:
+      "High-strength Portland cement for commercial and residential construction."
   },
   {
-    id: 'office-chairs',
-    name: 'Ergonomic Mesh Office Chairs',
-    category: 'Home & Furniture',
+    id: "office-chairs",
+    name: "Ergonomic Mesh Office Chairs",
     price: 72,
-    unit: 'piece',
-    moq: '20 pieces',
-    supplier: 'Nile Workspace',
-    initials: 'NW',
-    location: 'Cairo, Egypt',
-    badge: 'Popular',
-    image: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?auto=format&fit=crop&w=900&q=85',
-    description: 'Adjustable mesh-backed office chairs designed for comfortable, productive workspaces and bulk office fit-outs.'
+    unit: "piece",
+    moq: 20,
+    supplier: "Nile Workspace",
+    location: "Cairo, Egypt",
+    category: "Office",
+    description:
+      "Comfortable ergonomic mesh office chairs designed for businesses and workspaces."
   },
   {
-    id: 'diesel-generator',
-    name: '45kVA Silent Diesel Generator',
-    category: 'Industrial Equipment',
+    id: "generator",
+    name: "45kVA Silent Diesel Generator",
     price: 6200,
-    unit: 'unit',
-    moq: '1 unit',
-    supplier: 'PowerPro Africa',
-    initials: 'PA',
-    location: 'Lagos, Nigeria',
-    badge: 'Verified stock',
-    image: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=900&q=85',
-    description: 'Commercial-grade backup power with low-noise housing, automatic transfer compatibility, and local service support.'
+    unit: "unit",
+    moq: 1,
+    supplier: "PowerPro Africa",
+    location: "Lagos, Nigeria",
+    category: "Energy",
+    description:
+      "Reliable silent diesel generator for businesses, offices and commercial facilities."
   },
   {
-    id: 'brake-pads',
-    name: 'Ceramic Brake Pads - Toyota Hiace',
-    category: 'Auto Parts',
+    id: "brake-pads",
+    name: "Ceramic Brake Pads - Toyota Hiace",
     price: 28,
-    unit: 'set',
-    moq: '25 sets',
-    supplier: 'MobiParts Kenya',
-    initials: 'MK',
-    location: 'Mombasa, Kenya',
-    badge: 'Fast moving',
-    image: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=900&q=85',
-    description: 'Durable low-dust ceramic brake pad sets with dependable stopping performance for fleet and workshop buyers.'
+    unit: "set",
+    moq: 25,
+    supplier: "MobiParts Kenya",
+    location: "Mombasa, Kenya",
+    category: "Automotive",
+    description:
+      "Durable ceramic brake pads for Toyota Hiace vehicles."
   },
   {
-    id: 'kraft-boxes',
-    name: 'Custom Kraft Shipping Boxes',
-    category: 'Packaging',
+    id: "shipping-boxes",
+    name: "Custom Kraft Shipping Boxes",
     price: 0.42,
-    unit: 'box',
-    moq: '1,000 boxes',
-    supplier: 'Pack Africa',
-    initials: 'PA',
-    location: 'Johannesburg, South Africa',
-    badge: 'Customizable',
-    image: 'https://images.unsplash.com/photo-1586528116493-da8b9a7e2a9c?auto=format&fit=crop&w=900&q=85',
-    description: 'Recyclable kraft boxes available in custom sizes and printed finishes for growing retail and e-commerce brands.'
+    unit: "box",
+    moq: 1000,
+    supplier: "Pack Africa",
+    location: "Johannesburg, South Africa",
+    category: "Packaging",
+    description:
+      "Custom kraft packaging boxes for e-commerce brands, retailers and manufacturers."
   },
   {
-    id: 'thermal-paper',
-    name: 'POS Thermal Paper Rolls',
-    category: 'Office Supplies',
+    id: "thermal-paper",
+    name: "POS Thermal Paper Rolls",
     price: 1.15,
-    unit: 'roll',
-    moq: '200 rolls',
-    supplier: 'Deskwise Supplies',
-    initials: 'DS',
-    location: 'Kigali, Rwanda',
-    badge: 'Best value',
-    image: 'https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=900&q=85',
-    description: 'Reliable BPA-free thermal paper rolls compatible with standard POS terminals, printers, and retail counters.'
+    unit: "roll",
+    moq: 200,
+    supplier: "Deskwise Supplies",
+    location: "Kigali, Rwanda",
+    category: "Office",
+    description:
+      "High-quality thermal paper rolls for POS terminals and receipt printers."
   }
 ];
 
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function formatPrice(price) {
+  return "$" + Number(price).toLocaleString("en-US", {
+    minimumFractionDigits: price < 10 ? 2 : 0,
+    maximumFractionDigits: 2
+  });
+}
+
 function showToast(message) {
-  if (!toast) return;
+  let toast = document.getElementById("toast");
+
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+    toast.className = "toast";
+    document.body.appendChild(toast);
+  }
 
   toast.textContent = message;
-  toast.classList.add('show');
+  toast.classList.add("show");
 
-  window.clearTimeout(toastTimer);
-
-  toastTimer = window.setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3200);
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
 }
 
-function formatPrice(product) {
-  return `$${product.price.toLocaleString('en-US', {
-    minimumFractionDigits: product.price < 10 ? 2 : 0,
-    maximumFractionDigits: 2
-  })}`;
+/* =========================================================
+   REMOVE OLD AUTH UI
+   ========================================================= */
+
+function removeOldAuthUI() {
+  document.getElementById("auth-buttons")?.remove();
+  document.getElementById("auth-modal")?.remove();
 }
 
-function productCard(product) {
-  return `
-    <article class="product-card" data-product-id="${product.id}">
-      <button class="product-open" type="button" aria-label="View ${product.name}">
-        <div class="product-image" style="background-image:url('${product.image}');background-size:cover;background-position:center;">
-          <span class="product-badge">${product.badge}</span>
+/* =========================================================
+   PRODUCT MARKETPLACE
+   ========================================================= */
+
+function renderProducts(list = products) {
+  const grid = document.querySelector(".product-grid");
+
+  if (!grid) return;
+
+  grid.innerHTML = list.map(product => `
+    <article class="product-card">
+      <div class="product-image">
+        <div class="product-image-placeholder">
+          ${escapeHTML(product.category)}
+        </div>
+      </div>
+
+      <div class="product-content">
+        <div class="product-category">
+          ${escapeHTML(product.category)}
         </div>
 
-        <div class="product-info">
-          <p class="product-location">
-            ${product.location} <span>•</span> ${product.category}
-          </p>
+        <h3>${escapeHTML(product.name)}</h3>
 
-          <h3>${product.name}</h3>
-
-          <div class="product-price">
-            <strong>${formatPrice(product)} <small>/ ${product.unit}</small></strong>
-            <span>MOQ: ${product.moq}</span>
-          </div>
-
-          <div class="supplier-row">
-            <span class="supplier-avatar avatar-teal">${product.initials}</span>
-            <span>${product.supplier}</span>
-            <span class="verified">✓ Verified</span>
-          </div>
+        <div class="product-price">
+          ${formatPrice(product.price)}
+          <span>/${escapeHTML(product.unit)}</span>
         </div>
-      </button>
+
+        <div class="product-meta">
+          <span>MOQ: ${product.moq} ${escapeHTML(product.unit)}${product.moq === 1 ? "" : "s"}</span>
+        </div>
+
+        <div class="product-supplier">
+          <strong>${escapeHTML(product.supplier)}</strong>
+          <span>${escapeHTML(product.location)}</span>
+        </div>
+
+        <button
+          class="button button-small product-view-button"
+          data-product-id="${escapeHTML(product.id)}"
+        >
+          View Product
+        </button>
+      </div>
     </article>
-  `;
-}
-
-function renderProducts() {
-  if (!marketplaceSearch || !categoryFilter || !sortProducts) return;
-
-  const query = marketplaceSearch.value.trim().toLowerCase();
-  const category = categoryFilter.value;
-
-  let filtered = products.filter((product) => {
-    const searchable =
-      `${product.name} ${product.category} ${product.supplier}`.toLowerCase();
-
-    return (
-      (!query || searchable.includes(query)) &&
-      (category === 'all' || product.category === category)
-    );
-  });
-
-  if (sortProducts.value === 'price-low') {
-    filtered.sort((a, b) => a.price - b.price);
-  }
-
-  if (sortProducts.value === 'price-high') {
-    filtered.sort((a, b) => b.price - a.price);
-  }
-
-  productGrid.innerHTML = filtered.map(productCard).join('');
-  productGrid.hidden = filtered.length === 0;
-  emptyState.hidden = filtered.length !== 0;
-
-  marketplaceCount.textContent =
-    `${filtered.length} product${filtered.length === 1 ? '' : 's'}`;
-}
-
-function getCart() {
-  return JSON.parse(localStorage.getItem('zubaraq_cart') || '[]');
-}
-
-function saveCart(cart) {
-  localStorage.setItem('zubaraq_cart', JSON.stringify(cart));
-  updateCartCount();
-}
-
-function addToCart(product) {
-  const cart = getCart();
-  const existing = cart.find((item) => item.id === product.id);
-
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      unit: product.unit,
-      quantity: 1
-    });
-  }
-
-  saveCart(cart);
-  showToast(`${product.name} added to cart.`);
-}
-
-function updateCartCount() {
-  const count = getCart().reduce(
-    (total, item) => total + item.quantity,
-    0
-  );
-
-  const badge = document.querySelector('#cart-count');
-
-  if (badge) {
-    badge.textContent = count;
-    badge.hidden = count === 0;
-  }
+  `).join("");
 }
 
 function openProduct(productId) {
-  const product = products.find((item) => item.id === productId);
+  const product = products.find(item => item.id === productId);
 
   if (!product) return;
 
-  productDetail.innerHTML = `
-    <button class="detail-back" type="button">
-      ← Back to marketplace
-    </button>
+  closeModal("product-modal");
 
-    <div class="detail-layout">
-      <div
-        class="detail-image"
-        style="background-image:url('${product.image}');background-size:cover;background-position:center;"
-      >
-        <span class="product-badge">${product.badge}</span>
-      </div>
+  const modal = document.createElement("div");
+  modal.id = "product-modal";
+  modal.className = "zubaraq-modal";
 
-      <div class="detail-copy">
-        <p class="kicker">${product.category}</p>
-        <h2>${product.name}</h2>
+  modal.innerHTML = `
+    <div class="modal-box product-modal-box">
+      <button class="modal-close" onclick="closeModal('product-modal')">
+        ×
+      </button>
 
-        <p class="detail-description">
-          ${product.description}
+      <div class="auth-header">
+        <div class="auth-logo">Z</div>
+        <h2>${escapeHTML(product.name)}</h2>
+        <p class="modal-subtitle">
+          ${escapeHTML(product.supplier)} · ${escapeHTML(product.location)}
         </p>
+      </div>
 
-        <div class="detail-price">
-          <strong>${formatPrice(product)}</strong>
-          <span>/ ${product.unit}</span>
+      <p>${escapeHTML(product.description)}</p>
+
+      <div class="product-detail-info">
+        <div>
+          <strong>Price</strong>
+          <span>${formatPrice(product.price)} / ${escapeHTML(product.unit)}</span>
         </div>
 
-        <dl class="detail-facts">
-          <div>
-            <dt>Minimum order</dt>
-            <dd>${product.moq}</dd>
-          </div>
+        <div>
+          <strong>Minimum Order</strong>
+          <span>${product.moq} ${escapeHTML(product.unit)}${product.moq === 1 ? "" : "s"}</span>
+        </div>
 
-          <div>
-            <dt>Supplier</dt>
-            <dd>${product.supplier}</dd>
-          </div>
+        <div>
+          <strong>Category</strong>
+          <span>${escapeHTML(product.category)}</span>
+        </div>
 
-          <div>
-            <dt>Location</dt>
-            <dd>${product.location}</dd>
-          </div>
-
-          <div>
-            <dt>Verification</dt>
-            <dd class="verified">✓ Verified supplier</dd>
-          </div>
-        </dl>
-
-        <div class="detail-actions">
-          <button class="button" type="button" data-action="cart">
-            Add to Cart
-          </button>
-
-          <button class="button button-secondary" type="button" data-action="quote">
-            Request Quote
-          </button>
-
-          <button class="button button-secondary" type="button" data-action="contact">
-            Contact Supplier
-          </button>
+        <div>
+          <strong>Supplier</strong>
+          <span>${escapeHTML(product.supplier)}</span>
         </div>
       </div>
+
+      <button class="button" onclick="startOrder('${product.id}')">
+        Contact Supplier
+      </button>
     </div>
   `;
 
-  productGrid.hidden = true;
-  emptyState.hidden = true;
-  productDetail.hidden = false;
+  document.body.appendChild(modal);
 
-  productDetail.dataset.currentProduct = product.id;
-
-  productDetail.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
-  });
-}
-
-if (marketplaceSearch) {
-  marketplaceSearch.addEventListener('input', renderProducts);
-}
-
-if (sortProducts) {
-  sortProducts.addEventListener('change', renderProducts);
-}
-
-if (categoryFilter) {
-  categoryFilter.addEventListener('change', () => {
-    document.querySelectorAll('.category-pill').forEach((pill) => {
-      pill.classList.toggle(
-        'active',
-        pill.dataset.category === categoryFilter.value
-      );
-    });
-
-    renderProducts();
-  });
-}
-
-document.querySelectorAll('.category-pill').forEach((pill) => {
-  pill.addEventListener('click', () => {
-    categoryFilter.value = pill.dataset.category;
-
-    document.querySelectorAll('.category-pill').forEach((item) => {
-      item.classList.toggle('active', item === pill);
-    });
-
-    renderProducts();
-  });
-});
-
-if (productGrid) {
-  productGrid.addEventListener('click', (event) => {
-    const card = event.target.closest('[data-product-id]');
-
-    if (card) {
-      openProduct(card.dataset.productId);
+  modal.addEventListener("click", event => {
+    if (event.target === modal) {
+      closeModal("product-modal");
     }
   });
 }
 
-if (productDetail) {
-  productDetail.addEventListener('click', (event) => {
-    if (event.target.closest('.detail-back')) {
-      productDetail.hidden = true;
-      renderProducts();
+function startOrder(productId) {
+  const product = products.find(item => item.id === productId);
 
-      productGrid.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
+  if (!product) return;
 
+  supabaseClient.auth.getUser().then(({ data }) => {
+    if (!data.user) {
+      closeModal("product-modal");
+      showAuth("login");
+      showToast("Please log in to continue.");
       return;
     }
 
-    const action =
-      event.target.closest('[data-action]')?.dataset.action;
+    closeModal("product-modal");
 
-    if (action === 'cart') {
-      const product = products.find(
-        (item) => item.id === productDetail.dataset.currentProduct
-      );
-
-      if (product) {
-        addToCart(product);
-      }
-    }
-
-    if (action === 'quote') {
-      showToast('Quote request feature is being prepared.');
-    }
-
-    if (action === 'contact') {
-      showToast('Supplier messaging is coming next.');
-    }
-  });
-}
-
-if (clearFilters) {
-  clearFilters.addEventListener('click', () => {
-    marketplaceSearch.value = '';
-    categoryFilter.value = 'all';
-    sortProducts.value = 'recommended';
-
-    document.querySelectorAll('.category-pill').forEach((pill) => {
-      pill.classList.toggle(
-        'active',
-        pill.dataset.category === 'all'
-      );
-    });
-
-    renderProducts();
-  });
-}
-
-if (menuToggle) {
-  menuToggle.addEventListener('click', () => {
-    const isOpen = navMenu.classList.toggle('open');
-
-    menuToggle.setAttribute(
-      'aria-expanded',
-      String(isOpen)
-    );
-
-    menuToggle.setAttribute(
-      'aria-label',
-      isOpen ? 'Close menu' : 'Open menu'
+    showToast(
+      `Supplier contact for ${product.name} will be available in the next marketplace update.`
     );
   });
 }
 
-document.querySelectorAll('.nav-menu a').forEach((link) => {
-  link.addEventListener('click', () => {
-    navMenu.classList.remove('open');
+function closeModal(id) {
+  document.getElementById(id)?.remove();
+}
 
-    menuToggle.setAttribute(
-      'aria-expanded',
-      'false'
-    );
+/* =========================================================
+   AUTH MODAL
+   ========================================================= */
 
-    menuToggle.setAttribute(
-      'aria-label',
-      'Open menu'
-    );
-  });
-});
+function showAuth(mode = "login") {
+  closeModal("auth-modal");
 
-if (searchForm) {
-  searchForm.addEventListener('submit', (event) => {
+  const signup = mode === "signup";
+
+  const modal = document.createElement("div");
+  modal.id = "auth-modal";
+  modal.className = "zubaraq-modal";
+
+  modal.innerHTML = `
+    <div class="modal-box">
+
+      <button class="modal-close" onclick="closeModal('auth-modal')">
+        ×
+      </button>
+
+      <div class="auth-header">
+        <div class="auth-logo">Z</div>
+
+        <h2>
+          ${signup ? "Create your ZUBARAQ account" : "Welcome back"}
+        </h2>
+
+        <p>
+          ${
+            signup
+              ? "Join businesses trading across Africa."
+              : "Log in to your ZUBARAQ account."
+          }
+        </p>
+      </div>
+
+      <form id="auth-form">
+
+        ${
+          signup
+            ? `
+          <div class="form-group">
+            <label for="auth-name">Full Name</label>
+            <input
+              id="auth-name"
+              type="text"
+              placeholder="Your full name"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="auth-country">Country</label>
+            <input
+              id="auth-country"
+              type="text"
+              value="Nigeria"
+              placeholder="Country"
+            >
+          </div>
+        `
+            : ""
+        }
+
+        <div class="form-group">
+          <label for="auth-email">Email</label>
+          <input
+            id="auth-email"
+            type="email"
+            placeholder="you@example.com"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="auth-password">Password</label>
+          <input
+            id="auth-password"
+            type="password"
+            placeholder="Minimum 6 characters"
+            minlength="6"
+            required
+          >
+        </div>
+
+        <button
+          type="submit"
+          class="button"
+          id="auth-submit"
+          style="width:100%;"
+        >
+          ${signup ? "Create Account" : "Log In"}
+        </button>
+
+      </form>
+
+      <p class="auth-switch">
+        ${
+          signup
+            ? "Already have an account?"
+            : "Don't have an account?"
+        }
+
+        <button type="button" id="auth-switch-button">
+          ${signup ? "Log In" : "Sign Up"}
+        </button>
+      </p>
+
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  document.getElementById("auth-form").addEventListener("submit", event => {
     event.preventDefault();
 
-    const query = searchInput.value.trim();
-
-    if (query) {
-      marketplaceSearch.value = query;
-      renderProducts();
-
-      document
-        .querySelector('#marketplace')
-        ?.scrollIntoView({
-          behavior: 'smooth'
-        });
+    if (signup) {
+      signUp();
     } else {
-      showToast('Try searching for a product or supplier.');
+      logIn();
+    }
+  });
+
+  document
+    .getElementById("auth-switch-button")
+    .addEventListener("click", () => {
+      closeModal("auth-modal");
+      showAuth(signup ? "login" : "signup");
+    });
+
+  modal.addEventListener("click", event => {
+    if (event.target === modal) {
+      closeModal("auth-modal");
     }
   });
 }
 
-renderProducts();
-updateCartCount();
+/* =========================================================
+   SIGN UP
+   ========================================================= */
 
-// =========================================
-// ZUBARAQ AUTHENTICATION
-// =========================================
+async function signUp() {
+  const name = document.getElementById("auth-name")?.value.trim();
+  const email = document.getElementById("auth-email")?.value.trim();
+  const password = document.getElementById("auth-password")?.value;
+  const country =
+    document.getElementById("auth-country")?.value.trim() || "Nigeria";
 
-async function signUpUser(
-  email,
-  password,
-  fullName,
-  role = 'buyer'
-) {
-  const { data, error } =
-    await supabaseClient.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          role,
-          country: 'Nigeria'
-        }
+  const button = document.getElementById("auth-submit");
+
+  if (!name || !email || !password) {
+    showToast("Please complete all required fields.");
+    return;
+  }
+
+  if (password.length < 6) {
+    showToast("Password must be at least 6 characters.");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Creating account...";
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: name,
+        country,
+        role: "buyer"
       }
-    });
+    }
+  });
 
-  if (error) {
-    showToast(error.message);
-    return null;
-  }
-
-  showToast('Account created successfully!');
-
-  return data;
-}
-
-async function loginUser(email, password) {
-  const { data, error } =
-    await supabaseClient.auth.signInWithPassword({
-      email,
-      password
-    });
-
-  if (error) {
-    showToast(error.message);
-    return null;
-  }
-
-  showToast('Welcome back to ZUBARAQ!');
-
-  closeAuth();
-  showLoggedInUser(data.user);
-
-  return data;
-}
-
-async function logoutUser() {
-  const { error } =
-    await supabaseClient.auth.signOut();
+  button.disabled = false;
+  button.textContent = "Create Account";
 
   if (error) {
     showToast(error.message);
     return;
   }
 
-  closeDashboard();
+  closeModal("auth-modal");
 
-  showToast('You have been logged out.');
-
-  setTimeout(() => {
-    location.reload();
-  }, 700);
-}
-
-// =========================================
-// AUTH MODAL
-// =========================================
-
-let authMode = 'login';
-
-function showAuth(mode) {
-  authMode = mode;
-
-  const modal =
-    document.getElementById('auth-modal');
-
-  if (!modal) return;
-
-  modal.style.display = 'flex';
-
-  document.getElementById('auth-title').textContent =
-    mode === 'login'
-      ? 'Login to ZUBARAQ'
-      : 'Create ZUBARAQ Account';
-
-  document.getElementById('auth-submit').textContent =
-    mode === 'login'
-      ? 'Login'
-      : 'Sign Up';
-
-  document.getElementById('auth-name').style.display =
-    mode === 'signup'
-      ? 'block'
-      : 'none';
-}
-
-function closeAuth() {
-  const modal =
-    document.getElementById('auth-modal');
-
-  if (modal) {
-    modal.style.display = 'none';
+  if (data.session) {
+    showToast("Account created successfully. Welcome to ZUBARAQ!");
+  } else {
+    showToast(
+      "Account created. Check your email if confirmation is required."
+    );
   }
+
+  updateNavigation();
 }
 
-function switchAuth() {
-  showAuth(
-    authMode === 'login'
-      ? 'signup'
-      : 'login'
-  );
-}
+/* =========================================================
+   LOGIN
+   ========================================================= */
 
-async function submitAuth() {
-  const email =
-    document.getElementById('auth-email')
-      .value
-      .trim();
+async function logIn() {
+  const email = document.getElementById("auth-email")?.value.trim();
+  const password = document.getElementById("auth-password")?.value;
 
-  const password =
-    document.getElementById('auth-password')
-      .value
-      .trim();
-
-  const fullName =
-    document.getElementById('auth-name')
-      .value
-      .trim();
+  const button = document.getElementById("auth-submit");
 
   if (!email || !password) {
-    showToast(
-      'Please enter your email and password.'
-    );
+    showToast("Enter your email and password.");
     return;
   }
 
-  if (authMode === 'signup') {
-    if (!fullName) {
-      showToast(
-        'Please enter your full name.'
-      );
-      return;
-    }
+  button.disabled = true;
+  button.textContent = "Logging in...";
 
-    const result = await signUpUser(
-      email,
-      password,
-      fullName
-    );
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
 
-    if (result?.user) {
-      showAuth('login');
-    }
+  button.disabled = false;
+  button.textContent = "Log In";
 
+  if (error) {
+    showToast(error.message);
     return;
   }
 
-  await loginUser(email, password);
+  closeModal("auth-modal");
+
+  showToast("Welcome back to ZUBARAQ!");
+
+  updateNavigation();
 }
 
-// =========================================
-// ZUBARAQ ACCOUNT DASHBOARD
-// =========================================
+/* =========================================================
+   LOGOUT
+   ========================================================= */
 
-function createDashboard() {
-  if (document.getElementById('zubaraq-dashboard')) {
+async function logOut() {
+  const { error } = await supabaseClient.auth.signOut();
+
+  if (error) {
+    showToast(error.message);
     return;
   }
 
-  const dashboard = document.createElement('div');
+  closeModal("account-modal");
 
-  dashboard.id = 'zubaraq-dashboard';
+  showToast("You have been logged out.");
 
-  dashboard.innerHTML = `
-    <div class="dashboard-overlay" data-dashboard-close></div>
+  updateNavigation();
+}
 
-    <aside class="dashboard-panel">
+/* =========================================================
+   ACCOUNT DASHBOARD
+   ========================================================= */
+
+async function showAccount() {
+  const {
+    data: { user }
+  } = await supabaseClient.auth.getUser();
+
+  if (!user) {
+    showAuth("login");
+    return;
+  }
+
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  closeModal("account-modal");
+
+  const name =
+    profile?.full_name ||
+    user.user_metadata?.full_name ||
+    "ZUBARAQ User";
+
+  const email = user.email || "";
+
+  const country =
+    profile?.country ||
+    user.user_metadata?.country ||
+    "Nigeria";
+
+  const role = profile?.role || "buyer";
+
+  const initial = name.charAt(0).toUpperCase();
+
+  const modal = document.createElement("div");
+
+  modal.id = "account-modal";
+  modal.className = "zubaraq-modal";
+
+  modal.innerHTML = `
+    <div class="modal-box account-box">
 
       <button
-        class="dashboard-close"
-        type="button"
-        data-dashboard-close
+        class="modal-close"
+        onclick="closeModal('account-modal')"
       >
-        ✕
+        ×
       </button>
 
-      <div class="dashboard-header">
-        <span class="brand-mark">Z</span>
+      <div class="account-header">
+        <div class="account-avatar">${escapeHTML(initial)}</div>
 
         <div>
-          <strong>ZUBARAQ</strong>
-          <small>Business Account</small>
+          <h2>${escapeHTML(name)}</h2>
+          <p>${escapeHTML(email)}</p>
         </div>
       </div>
 
-      <div class="dashboard-user">
-        <div class="dashboard-avatar" id="dashboard-avatar">
-          Z
-        </div>
-
-        <div>
-          <strong id="dashboard-name">
-            User
-          </strong>
-
-          <small id="dashboard-email">
-            —
-          </small>
-        </div>
-      </div>
-
-      <nav class="dashboard-nav">
-
+      <div class="account-tabs">
         <button
-          class="dashboard-nav-item active"
-          data-tab="overview"
-        >
-          🏠 Overview
-        </button>
-
-        <button
-          class="dashboard-nav-item"
+          class="account-tab active"
           data-tab="profile"
         >
-          👤 My Profile
+          Profile
         </button>
 
         <button
-          class="dashboard-nav-item"
+          class="account-tab"
           data-tab="orders"
         >
-          📦 My Orders
+          Orders
         </button>
 
         <button
-          class="dashboard-nav-item"
+          class="account-tab"
           data-tab="supplier"
         >
-          🏪 Become a Supplier
+          Supplier
+        </button>
+      </div>
+
+      <div id="account-content">
+
+        <div class="account-section">
+          <h3>Account Information</h3>
+
+          <div class="account-info-row">
+            <span>Full Name</span>
+            <strong>${escapeHTML(name)}</strong>
+          </div>
+
+          <div class="account-info-row">
+            <span>Email</span>
+            <strong>${escapeHTML(email)}</strong>
+          </div>
+
+          <div class="account-info-row">
+            <span>Country</span>
+            <strong>${escapeHTML(country)}</strong>
+          </div>
+
+          <div class="account-info-row">
+            <span>Account Type</span>
+            <strong>${escapeHTML(role)}</strong>
+          </div>
+        </div>
+
+        <button class="account-logout" onclick="logOut()">
+          Log Out
         </button>
 
-        <button
-          class="dashboard-nav-item"
-          data-tab="cart"
-        >
-          🛒 My Cart
-          <span id="cart-count">0</span>
-        </button>
+      </div>
 
-      </nav>
+    </div>
+  `;
 
-      <button
-        class="dashboard-logout"
-        onclick="logoutUser()"
-      >
-        Log out
-      </button>
+  document.body.appendChild(modal);
 
-      <div class="dashboard-content">
+  modal.addEventListener("click", event => {
+    if (event.target === modal) {
+      closeModal("account-modal");
+    }
+  });
 
-        <section
-          class="dashboard-tab active"
-          id="tab-overview"
-        >
-          <p class="kicker">Your ZUBARAQ account</p>
+  modal.querySelectorAll(".account-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      modal
+        .querySelectorAll(".account-tab")
+        .forEach(item => item.classList.remove("active"));
 
-          <h2>Welcome to your dashboard.</h2>
+      tab.classList.add("active");
 
-          <div class="dashboard-cards">
+      const selected = tab.dataset.tab;
 
-            <div class="dashboard-card">
-              <span>📦</sp
+      if (selected === "profile") {
+        showProfileContent(profile, user);
+      }
+
+      if (selected === "orders") {
+        showOrdersContent(user);
+      }
+
+      if (selected === "supplier") {
+        showSupplierContent(user);
+      }
+    });
+  });
+}
+
+/* =========================================================
+   PROFILE TAB
+   ========================================================= */
+
+function showProfileContent(profile, user) {
+  const content = document.getElementById("account-content");
+
+  if (!content) return;
+
+  const name =
+    profile?.full_name ||
+    user.user_metadata?.full_name ||
+    "ZUBARAQ User";
+
+  const country =
+    profile?.country ||
+    user.user_metadata?.country ||
+    "Nigeria";
+
+  const role = profile?.role || "buyer";
+
+  content.innerHTML = `
+    <div class="account-section">
+      <h3>Account Information</h3>
+
+      <div class="account-info-row">
+        <span>Full Name</span>
+        <strong>${escapeHTML(name)}</strong>
+      </div>
+
+      <div class="account-info-row">
+        <span>Email</span>
+        <strong>${escapeHTML(user.email)}</strong>
+      </div>
+
+      <div class="account-info-row">
+        <span>Country</span>
+        <strong>${escapeHTML(country)}</strong>
+      </div>
+
+      <div class="account-info-row">
+        <span>Account Type</span>
+        <strong>${escapeHTML(role)}</strong>
+      </div>
+    </div>
+
+    <button class="account-logout" onclick="logOut()">
+      Log Out
+    </button>
+  `;
+}
+
+/* =========================================================
+   ORDERS TAB
+   ========================================================= */
+
+async function showOrdersContent(user) {
+  const content = document.getElementById("account-content");
+
+  if (!content) return;
+
+  content.innerHTML = `
+    <div class="account-section">
+      <h3>My Orders</h3>
+      <p class="modal-subtitle">Loading your orders...</p>
+    </div>
+  `;
+
+  const { data: orders, error } = await supabaseClient
+    .from("orders")
+    .select("*")
+    .eq("buyer_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    content.innerHTML = `
+      <div class="empty-account">
+        <div class="empty-icon">⚠️</div>
+        <h3>Unable to load orders</h3>
+        <p>${escapeHTML(error.message)}</p>
+      </div>
+    `;
+    return;
+  }
+
+  if (!orders || orders.length === 0) {
+    content.innerHTML = `
+      <div class="empty-account">
+        <div class="empty-icon">📦</div>
+        <h3>No orders yet</h3>
+        <p>Your ZUBARAQ orders will appear here.</p>
+      </div>
+    `;
+    return;
+  }
+
+  content.innerHTML = `
+    <div class="account-section">
+      <h3>My Orders</h3>
+
+      ${orders.map(order => `
+        <div class="order-c
