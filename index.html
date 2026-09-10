@@ -108,7 +108,33 @@
 
     <footer class="footer" id="footer"><div class="container footer-main"><div class="footer-brand"><a class="brand brand-light" href="#top"><span class="brand-mark">Z</span><span>ZUBARAQ</span></a><p>Connecting African Business.</p><div class="socials"><a href="#footer" aria-label="LinkedIn">in</a><a href="#footer" aria-label="Instagram">ig</a><a href="#footer" aria-label="X">𝕏</a></div></div><div class="footer-links"><div><h4>Explore</h4><a href="#marketplace">Marketplace</a><a href="#categories">Categories</a><a href="#suppliers">Suppliers</a></div><div><h4>Company</h4><a href="#why-zubaraq">About us</a><a href="#footer">Contact</a><a href="#footer">Careers</a></div><div><h4>Join Zubaraq</h4><a href="#footer">Start buying</a><a href="#footer">Become a supplier</a><a href="#footer">Help centre</a></div></div></div><div class="container footer-bottom"><span>© 2024 ZUBARAQ. Built for African business.</span><span>Privacy&nbsp;&nbsp; Terms</span><span>Made for Africa <span class="gold-star">✦</span></span></div></footer>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  
+<!-- ZUBARAQ AUTH BUTTONS -->
+<div id="auth-buttons" style="display:flex; gap:10px; align-items:center;">
+  <button onclick="showAuth('login')">Login</button>
+  <button onclick="showAuth('signup')">Sign Up</button>
+</div>
+
+<!-- ZUBARAQ AUTH MODAL -->
+<div id="auth-modal" style="display:none;">
+  <div>
+    <button onclick="closeAuth()">✕</button>
+
+    <h2 id="auth-title">Login to ZUBARAQ</h2>
+
+    <input id="auth-name" type="text" placeholder="Full Name" style="display:none;">
+    
+    <input id="auth-email" type="email" placeholder="Email">
+    
+    <input id="auth-password" type="password" placeholder="Password">
+
+    <button id="auth-submit" onclick="submitAuth()">Login</button>
+
+    <p>
+      <span id="auth-switch-text">Don't have an account?</span>
+      <button onclick="switchAuth()">Sign Up</button>
+    </p>
+  </div>
+</div>  
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="script.js"></script>
 </body>  <script src="script.js"></script>
