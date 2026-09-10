@@ -1,9 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 :root {
-  --green: #087443;
-  --green-dark: #075a35;
-  --green-light: #eaf6ef;
+  --red: #087443;
+  --red-dark: #075a35;
+  --red-light: #eaf6ef;
   --navy: #0b172a;
   --gold: #e5a928;
   --off-white: #f7f8f5;
