@@ -150,3 +150,54 @@ document.querySelectorAll('a[href="#footer"]').forEach((link) => {
     }
   });
 });
+// =========================================
+// ZUBARAQ AUTHENTICATION
+// =========================================
+
+async function signUpUser(email, password, fullName, role = 'buyer') {
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+      data: {
+        full_name: fullName,
+        role: role,
+        country: 'Nigeria'
+      }
+    }
+  });
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  showToast('Account created successfully!');
+  return data;
+}
+
+async function loginUser(email, password) {
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  showToast('Welcome back to ZUBARAQ!');
+  return data;
+}
+
+async function logoutUser() {
+  const { error } = await supabaseClient.auth.signOut();
+
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  showToast('You have been logged out.');
+}
