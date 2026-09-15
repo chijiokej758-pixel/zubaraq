@@ -1354,3 +1354,17 @@ section {
     white-space: nowrap;
   }
 }
+
+
+.jovar-logo {
+  font-family: Arial, sans-serif;
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  color: #111;
+  text-align: center;
+}
+
+.jovar-logo span {
+  font-size: 48px;
+}
